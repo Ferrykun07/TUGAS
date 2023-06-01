@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRUD Dosen</title>
+</head>
+<body>
+    <?php
+    // Konfigurasi koneksi ke database
+    $servername = "localhost";
+    $username = "root";
+    $password = "";
+    $dbname = "siakad";
+
+    // Membuat koneksi ke database
+    $conn = new mysqli($servername, $username, $password, $dbname);
+
+    // Memeriksa koneksi
+    if ($conn->connect_error) {
+        die("Koneksi gagal: " . $conn->connect_error);
+    }
+
+    // Fungsi untuk menambahkan data dosen
+    if (isset($_POST['create'])) {
+        $nama = $_POST['nama'];
+        $NIDN = $_POST['NIDN'];
+        $jenjang_studi = $_POST['jenjang_studi'];
+
+        $sql = "INSERT INTO dosen (nama, NIDN, jenjang_studi) VALUES ('$nama', '$NIDN', '$jenjang_studi')";
+
+        if ($conn->query($sql) === TRUE) {
+            echo "Data dosen berhasil ditambahkan.";
+        } else {
+            echo "Error: " . $sql . "<br>" . $conn->error;
+        }
+    }
+    
+    // Fungsi Update
+    if (isset($_POST['update'])) {
+        $id = $_POST['id'];
+        $nama = $_POST['nama'];
+        $NIDN = $_POST['NIDN'];
+        $jenjang_studi = $_POST['jenjang_studi'];
+    
+        $sql = "UPDATE dosen SET nama='$nama', NIDN='$NIDN', jenjang_studi='$jenjang_studi' WHERE id='$id'";
+    
+        if ($conn->query($sql) === TRUE) {
+            echo "Data dosen berhasil diupdate.";
+        } else {
+            echo "Error: " . $sql . "<br>" . $conn->error;
+        }
+    }
+
+    // Fungsi untuk membaca data dosen
+    function readdosen() {
+        global $conn;
+        $sql = "SELECT * FROM dosen";
+        $result = $conn->query($sql);
+
+        if ($result->num_rows > 0) {
+            // Output data setiap baris
+            while($row = $result->fetch_assoc()) {
+                echo "<tr>";
+                echo "<td>" . $row["id"] . "</td>";
+                echo "<td>" . $row["nama"] . "</td>";
+                echo "<td>" . $row["NIDN"] . "</td>";
+                echo "<td>" . $row["jenjang_studi"] . "</td>";
+                echo "</tr>";
+            }
+        } else {
+            echo "Tidak ada data dosen.";
+        }
+    }
+
+    // Fungsi untuk menghapus data dosen
+    if (isset($_GET['delete'])) {
+        $id = $_GET['delete'];
+        $sql = "DELETE FROM dosen WHERE id = $id";
+
+        if ($conn->query($sql) === TRUE) {
+            echo "Data dosen berhasil dihapus.";
+        } else {
+            echo "Error: " . $sql . "<br>" . $conn->error;
+        }
+    }
+    ?>
+
+    <center>=====CRUD Dosen=====</center>
+    <table>
+        <tr>
+            <td>ID</td>
+            <td>Nama</td>
+            <td>NIDN</td>
+            <td>jenjang studi</td>
+            <td>Action</td>
+        </tr>
+        <?php readdosen(); ?>
+    </table>
+
+    <form method="post">
+        <input type="text" name="nama" placeholder="Nama" maxlength="255">
+        <input type="text" name="NIDN" placeholder="NIDN"  maxlength="8"> 
+        <input type="text" name="jenjang_studi" placeholder="jenjang studi">
+        <button type="submit" name="create">Tambah dosen</button><br>
+        ==================================================================<br>
+        <input type="text" name="id" placeholder="ID">
+        <input type="text" name="nama" placeholder="Nama" maxlength="255">
+        <input type="text" name="NIDN" placeholder="NIDN" >
+        <input type="radio" value="S3" name="jenjang_studi" placeholder="jenjang studi"><label for="">S3</label>
+        <input type="radio" value="S2" name="jenjang_studi" placeholder="jenjang studi"><label for="">S2</label>
+        <button type="submit" name="update">Update</button>
+    </form>
+</body>
